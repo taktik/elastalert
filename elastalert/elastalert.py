@@ -147,7 +147,7 @@ class ElastAlerter():
         self.from_addr = self.conf.get('from_addr', 'ElastAlert')
         self.smtp_host = self.conf.get('smtp_host', 'localhost')
         self.max_aggregation = self.conf.get('max_aggregation', 10000)
-        self.limit_execution_margin = self.conf.get('limit_execution_margin', 20)
+        self.limit_execution_margin = self.conf.get('limit_execution_margin', 1)
         self.buffer_time = self.conf['buffer_time']
         self.silence_cache = {}
         self.rule_hashes = get_rule_hashes(self.conf, self.args.rule)
