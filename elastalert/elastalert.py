@@ -1234,22 +1234,7 @@ class ElastAlerter():
             endtime = ts_now()
 
         # Apply rules based on execution time limits
-        if rule.get('limit_execution'):
-            rule['next_starttime'] = None
-            rule['next_min_starttime'] = None
-            exec_next = croniter(rule['limit_execution']).next()
-            endtime_epoch = dt_to_unix(endtime)
-            # If the estimated next endtime (end + run_every) isn't at least a minute past the next exec time
-            # That means that we need to pause execution after this run
-            if endtime_epoch + rule['run_every'].total_seconds() < exec_next - (60-self.limit_execution_margin) and not rule['has_run_once']:
-                # apscheduler requires pytz tzinfos, so don't use unix_to_dt here!
-                rule['next_starttime'] = datetime.datetime.utcfromtimestamp(exec_next).replace(tzinfo=pytz.utc)
-                if rule.get('limit_execution_coverage'):
-                    rule['next_min_starttime'] = rule['next_starttime']
-                if not rule['has_run_once']:
-                    self.reset_rule_schedule(rule)
-                    rule['has_run_once'] = True
-                return
+
 
         rule['has_run_once'] = True
         try:
@@ -1279,6 +1264,17 @@ class ElastAlerter():
                 )
 
         rule['initial_starttime'] = None
+        if rule.get('limit_execution'):
+            rule['next_starttime'] = None
+            rule['next_min_starttime'] = None
+            exec_next = croniter(rule['limit_execution']).next()
+            # If the estimated next endtime (end + run_every) isn't at least a minute past the next exec time
+            # That means that we need to pause execution after this run
+            # apscheduler requires pytz tzinfos, so don't use unix_to_dt here!
+            rule['next_starttime'] = datetime.datetime.utcfromtimestamp(exec_next).replace(tzinfo=pytz.utc)
+            if rule.get('limit_execution_coverage'):
+                rule['next_min_starttime'] = rule['next_starttime']
+            self.reset_rule_schedule(rule)
 
         self.remove_old_events(rule)
 
