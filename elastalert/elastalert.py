@@ -1248,7 +1248,8 @@ class ElastAlerter():
                     rule['next_min_starttime'] = rule['next_starttime']
                 if not rule['has_run_once']:
                     self.reset_rule_schedule(rule)
-                    return
+                    rule['has_run_once'] = True
+                return
 
         rule['has_run_once'] = True
         try:
