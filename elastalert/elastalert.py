@@ -1241,7 +1241,7 @@ class ElastAlerter():
             endtime_epoch = dt_to_unix(endtime)
             # If the estimated next endtime (end + run_every) isn't at least a minute past the next exec time
             # That means that we need to pause execution after this run
-            if endtime_epoch + rule['run_every'].total_seconds() < exec_next - (60-self.limit_execution_margin):
+            if endtime_epoch + rule['run_every'].total_seconds() < exec_next - (60-self.limit_execution_margin) and not rule['has_run_once']:
                 # apscheduler requires pytz tzinfos, so don't use unix_to_dt here!
                 rule['next_starttime'] = datetime.datetime.utcfromtimestamp(exec_next).replace(tzinfo=pytz.utc)
                 if rule.get('limit_execution_coverage'):
